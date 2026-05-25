@@ -24,7 +24,7 @@ export function SearchFilter({ onSearch, loading }: SearchFilterProps) {
 
   return (
     <form className="search-filter" onSubmit={handleSubmit}>
-      <h1>GitHub Repository Ranker</h1>
+      <h1>RedCare - GitHub Repo Ranker</h1>
       
       <div className="form-group">
         <label htmlFor="language">Programming Language</label>
