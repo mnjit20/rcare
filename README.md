@@ -1,3 +1,21 @@
+## Run
+
+To run all apps and packages, run the following command:
+
+```sh
+npm run dev
+```
+
+Without global `turbo`, use your package manager:
+
+```sh
+cd my-turborepo
+npx turbo build
+npm dlx turbo build
+npm exec turbo build
+```
+
+
 ## Build
 
 To build all apps and packages, run the following command:
@@ -69,5 +87,3 @@ npx turbo dev --filter=backend
 npm exec turbo dev --filter=backend
 npm exec turbo dev --filter=backend
 ```
-
-### Run
