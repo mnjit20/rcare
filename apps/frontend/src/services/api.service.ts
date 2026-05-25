@@ -1,6 +1,6 @@
 import type { ApiResponse, ApiError, SearchFilters } from '../types';
 
-const API_BASE = '/api';
+const API_BASE = 'http://localhost:3000';
 
 export async function fetchRepositories(filters: SearchFilters): Promise<ApiResponse> {
   const params = new URLSearchParams({
