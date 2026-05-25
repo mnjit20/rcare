@@ -5,6 +5,16 @@ To run all apps and packages, run the following command:
 ```sh
 npm run dev
 ```
+## Project structure
+```sh
+repo/
+ ├── apps/
+ │     ├── frontend
+ │     └── backend
+ │
+ ├── packages/
+ │     └── shared-types
+```
 
 Without global `turbo`, use your package manager:
 
