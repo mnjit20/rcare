@@ -15,6 +15,20 @@ repo/
  ├── packages/
  │     └── shared-types
 ```
+## Run with docker
+
+```sh
+docker compose build --no-cache
+docker compose up
+
+```
+Frontend:
+http://localhost:5173
+
+Backend:
+http://localhost:3000
+
+
 
 Without global `turbo`, use your package manager:
 

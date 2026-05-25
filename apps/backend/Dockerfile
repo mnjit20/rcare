@@ -1,25 +1,35 @@
-FROM node:18-alpine AS builder
+# ---------- BUILD ----------
+FROM node:22-alpine AS builder
 
 WORKDIR /app
 
-COPY package.json package-lock.json ./
-COPY apps/backend/package.json ./apps/backend/
-COPY packages/typescript-config ./packages/typescript-config/
-COPY packages/eslint-config ./packages/eslint-config/
+# Copy entire repo
+COPY . .
 
-RUN npm ci
+# Install all dependencies
+RUN npm install
 
-COPY apps/backend ./apps/backend
-COPY tsconfig.json ./
+# Build backend
+RUN npm run build --workspace=backend
 
-RUN npm -w apps/backend run build
 
-FROM node:18-alpine
+# ---------- RUNTIME ----------
+FROM node:22-alpine
 
 WORKDIR /app
 
-COPY --from=builder /app/apps/backend/dist ./dist
-COPY --from=builder /app/node_modules ./node_modules
+ENV NODE_ENV=production
+
+# Copy backend package
+COPY apps/backend/package*.json ./
+
+# Install backend deps
+RUN npm install --omit=dev
+
+# Copy build output
+COPY --from=builder \
+/app/apps/backend/dist \
+./dist
 
 EXPOSE 3000
 

@@ -1,22 +1,24 @@
-FROM node:18-alpine AS builder
+# ---------- Builder ----------
+FROM node:22-alpine AS builder
 
 WORKDIR /app
 
-COPY package.json package-lock.json ./
-COPY apps/frontend/package.json ./apps/frontend/
-COPY packages/typescript-config ./packages/typescript-config/
-COPY packages/eslint-config ./packages/eslint-config/
-
-RUN npm ci
+COPY package*.json ./
+COPY turbo.json ./
 
 COPY apps/frontend ./apps/frontend
-COPY tsconfig.json ./
 
-RUN npm -w apps/frontend run build
+RUN npm install
 
+RUN npm run build --workspace=frontend
+
+
+# ---------- Runtime ----------
 FROM nginx:alpine
 
-COPY --from=builder /app/apps/frontend/dist /usr/share/nginx/html
+COPY --from=builder \
+/app/apps/frontend/dist \
+/usr/share/nginx/html
 
 EXPOSE 80
 
