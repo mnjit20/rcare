@@ -1,113 +1,105 @@
-## Run
+# RedCare - GitHub Repo Ranker
 
-To run all apps and packages, run the following command:
+A monorepo fullstack application built with modern tooling and best practices.
 
-```sh
+## Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| **Frontend** | React 19 + TypeScript + Vite |
+| **Backend** | NestJS (Express) + TypeScript |
+| **Monorepo** | npm workspaces + Turborepo |
+| **Deployment** | Docker + Docker Compose |
+
+## Project Structure
+
+```
+rcare/
+├── apps/
+│   ├── backend/          # NestJS REST API server
+│   └── frontend/         # React web application (Vite)
+├── packages/
+│   ├── eslint-config/    # Shared ESLint configurations
+│   └── typescript-config/ # Shared TypeScript base configs
+├── docker-compose.yml    # Multi-container setup
+└── turbo.json           # Turborepo configuration
+```
+
+## Quick Start
+
+### Prerequisites
+- **Node.js**: 18+
+- **npm**: 11.13.0+
+
+### Development
+
+Start all apps with hot-reload:
+```bash
+npm install
 npm run dev
 ```
-## Project structure
-```sh
-repo/
- ├── apps/
- │     ├── frontend
- │     └── backend
- │
- ├── packages/
- │     └── shared-types
-```
-## Run with docker
 
-```sh
+Access the apps:
+- **Frontend**: http://localhost:5173
+- **Backend**: http://localhost:3000
+
+### Production Build
+
+```bash
+npm run build
+```
+
+### With Docker
+
+```bash
 docker compose build --no-cache
 docker compose up
-
-```
-Frontend:
-http://localhost:5173
-
-Backend:
-http://localhost:3000
-
-
-
-Without global `turbo`, use your package manager:
-
-```sh
-cd my-turborepo
-npx turbo build
-npm dlx turbo build
-npm exec turbo build
 ```
 
+Then access:
+- **Frontend**: http://localhost:5173
+- **Backend**: http://localhost:3000
 
-## Build
+## Commands
 
-To build all apps and packages, run the following command:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo build
+### Root Level (All Apps)
+```bash
+npm run dev          # Start all apps in dev mode
+npm run build        # Build all apps for production
+npm run lint         # Lint all code
+npm run format       # Format code with Prettier
+npm run check-types  # Type check all apps
 ```
 
-Without global `turbo`, use your package manager:
+### Individual Apps
 
-```sh
-cd my-turborepo
-npx turbo build
-npm dlx turbo build
-npm exec turbo build
+**Backend:**
+```bash
+npm -w apps/backend run dev         # Start in watch mode
+npm -w apps/backend run test        # Run unit tests
+npm -w apps/backend run test:watch  # Run tests in watch mode
+npm -w apps/backend run test:cov    # Coverage report
 ```
 
-You can build a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo build --filter=backend
+**Frontend:**
+```bash
+npm -w apps/frontend run dev        # Start dev server
+npm -w apps/frontend run build      # Build for production
+npm -w apps/frontend run preview    # Preview production build
 ```
 
-Without global `turbo`:
-
-```sh
-npx turbo build --filter=backend
-npm exec turbo build --filter=backend
-npm exec turbo build --filter=backend
+### Using Turbo (if installed globally)
+```bash
+turbo build --filter=backend        # Build specific app
+turbo dev --filter=frontend         # Dev only frontend
+turbo run lint --filter=packages/*  # Lint only packages
 ```
 
-### Develop
+## Architecture Highlights
 
-To develop all apps and packages, run the following command:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo dev
-```
-
-Without global `turbo`, use your package manager:
-
-```sh
-cd my-turborepo
-npx turbo dev
-npm exec turbo dev
-npm exec turbo dev
-```
-
-You can develop a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo dev --filter=backend
-```
-
-Without global `turbo`:
-
-```sh
-npx turbo dev --filter=backend
-npm exec turbo dev --filter=backend
-npm exec turbo dev --filter=backend
-```
+- **Monorepo**: Unified development experience with shared configurations
+- **Type Safety**: Full TypeScript across frontend and backend
+- **Modular**: Services contain business logic, controllers handle routes
+- **Tested**: Jest for unit and e2e tests
+- **Code Quality**: ESLint + Prettier for consistency
+- **DevOps**: Docker containerized for easy deployment
