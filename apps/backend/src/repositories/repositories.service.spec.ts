@@ -73,9 +73,16 @@ describe('RepositoriesService', () => {
 
     it('should return paginated repositories with scores on cache miss', async () => {
       mockGithubService.searchRepositories.mockResolvedValue(mockRepos);
-      mockScoringService.computeScore.mockReturnValueOnce(75).mockReturnValueOnce(50);
+      mockScoringService.computeScore
+        .mockReturnValueOnce(75)
+        .mockReturnValueOnce(50);
 
-      const result = await service.getRepositories('typescript', '2023-01-01', 1, 20);
+      const result = await service.getRepositories(
+        'typescript',
+        '2023-01-01',
+        1,
+        20,
+      );
 
       expect(result.items).toHaveLength(2);
       expect(result.items[0].popularityScore).toBe(75);
@@ -94,13 +101,25 @@ describe('RepositoriesService', () => {
 
     it('should return cached data on cache hit', async () => {
       mockGithubService.searchRepositories.mockResolvedValue(mockRepos);
-      mockScoringService.computeScore.mockReturnValueOnce(75).mockReturnValueOnce(50);
+      mockScoringService.computeScore
+        .mockReturnValueOnce(75)
+        .mockReturnValueOnce(50);
 
-      const result1 = await service.getRepositories('typescript', '2023-01-01', 1, 20);
+      const result1 = await service.getRepositories(
+        'typescript',
+        '2023-01-01',
+        1,
+        20,
+      );
 
       mockGithubService.searchRepositories.mockClear();
 
-      const result2 = await service.getRepositories('typescript', '2023-01-01', 1, 20);
+      const result2 = await service.getRepositories(
+        'typescript',
+        '2023-01-01',
+        1,
+        20,
+      );
 
       expect(result2).toEqual(result1);
       expect(mockGithubService.searchRepositories).not.toHaveBeenCalled();
@@ -110,10 +129,22 @@ describe('RepositoriesService', () => {
       mockGithubService.searchRepositories
         .mockResolvedValueOnce([mockRepos[0]])
         .mockResolvedValueOnce([mockRepos[1]]);
-      mockScoringService.computeScore.mockReturnValueOnce(75).mockReturnValueOnce(50);
+      mockScoringService.computeScore
+        .mockReturnValueOnce(75)
+        .mockReturnValueOnce(50);
 
-      const result1 = await service.getRepositories('typescript', '2023-01-01', 1, 20);
-      const result2 = await service.getRepositories('python', '2024-01-01', 1, 20);
+      const result1 = await service.getRepositories(
+        'typescript',
+        '2023-01-01',
+        1,
+        20,
+      );
+      const result2 = await service.getRepositories(
+        'python',
+        '2024-01-01',
+        1,
+        20,
+      );
 
       expect(result1.items[0].id).toBe(1);
       expect(result2.items[0].id).toBe(2);
@@ -122,9 +153,16 @@ describe('RepositoriesService', () => {
 
     it('should sort repositories by popularity score descending', async () => {
       mockGithubService.searchRepositories.mockResolvedValue(mockRepos);
-      mockScoringService.computeScore.mockReturnValueOnce(50).mockReturnValueOnce(75);
+      mockScoringService.computeScore
+        .mockReturnValueOnce(50)
+        .mockReturnValueOnce(75);
 
-      const result = await service.getRepositories('typescript', '2023-01-01', 1, 20);
+      const result = await service.getRepositories(
+        'typescript',
+        '2023-01-01',
+        1,
+        20,
+      );
 
       expect(result.items[0].popularityScore).toBe(75);
       expect(result.items[1].popularityScore).toBe(50);
@@ -139,7 +177,12 @@ describe('RepositoriesService', () => {
       mockGithubService.searchRepositories.mockResolvedValue(manyRepos);
       mockScoringService.computeScore.mockReturnValue(50);
 
-      const result = await service.getRepositories('typescript', '2023-01-01', 1, 20);
+      const result = await service.getRepositories(
+        'typescript',
+        '2023-01-01',
+        1,
+        20,
+      );
 
       expect(result.pagination.totalCount).toBe(45);
       expect(result.pagination.totalPages).toBe(3);

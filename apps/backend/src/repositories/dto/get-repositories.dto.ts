@@ -1,4 +1,12 @@
-import { IsString, IsNotEmpty, IsISO8601, IsOptional, IsInt, Min, Max } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsISO8601,
+  IsOptional,
+  IsInt,
+  Min,
+  Max,
+} from 'class-validator';
 import { Transform } from 'class-transformer';
 
 export class GetRepositoriesDto {

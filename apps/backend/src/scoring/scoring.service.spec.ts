@@ -105,7 +105,9 @@ describe('ScoringService', () => {
 
     it('should return 0.2 recency factor for updates older than 90 days', () => {
       const now = new Date();
-      const date180DaysAgo = new Date(now.getTime() - 180 * 24 * 60 * 60 * 1000);
+      const date180DaysAgo = new Date(
+        now.getTime() - 180 * 24 * 60 * 60 * 1000,
+      );
 
       const score = service.computeScore({
         stars: 0,
@@ -130,7 +132,10 @@ describe('ScoringService', () => {
       const expectedNormForks = 2000 / 10000;
       const expectedRecency = 1.0;
       const expectedScore = Math.round(
-        (0.5 * expectedNormStars + 0.3 * expectedNormForks + 0.2 * expectedRecency) * 100,
+        (0.5 * expectedNormStars +
+          0.3 * expectedNormForks +
+          0.2 * expectedRecency) *
+          100,
       );
 
       expect(score).toBe(expectedScore);

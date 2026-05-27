@@ -1,6 +1,12 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { Octokit } from '@octokit/rest';
 import { Repository } from '../common/types';
+import { GithubRepository } from './github-api.types';
+import {
+  isAbortError,
+  isGithubApiError,
+  getRetryAfter,
+} from './github-error.types';
 
 @Injectable()
 export class GithubService {
@@ -34,13 +40,13 @@ export class GithubService {
           per_page: limit,
           page,
           request: {
-            signal: controller.signal as any,
+            signal: controller.signal,
           },
         });
 
         clearTimeout(timeoutId);
 
-        return response.data.items.map((repo: any) => ({
+        return response.data.items.map((repo: GithubRepository) => ({
           id: repo.id,
           name: repo.name,
           description: repo.description || null,
@@ -51,34 +57,37 @@ export class GithubService {
           lastUpdated: repo.updated_at,
           createdAt: repo.created_at,
         }));
-      } catch (error: any) {
+      } catch (error: unknown) {
         clearTimeout(timeoutId);
         throw error;
       }
-    } catch (error: any) {
-      if (error.name === 'AbortError') {
+    } catch (error: unknown) {
+      if (isAbortError(error)) {
         throw new HttpException(
           'GitHub API request timeout',
           HttpStatus.SERVICE_UNAVAILABLE,
         );
       }
 
-      if (error.status === 429 || error.status === 403) {
-        const retryAfter = error.headers?.['retry-after'] || 60;
-        throw new HttpException(
-          {
-            message: 'GitHub API rate limit exceeded',
-            retryAfter,
-          },
-          HttpStatus.TOO_MANY_REQUESTS,
-        );
-      }
+      if (isGithubApiError(error)) {
+        const { status } = error;
+        if (status === 429 || status === 403) {
+          const retryAfter = getRetryAfter(error);
+          throw new HttpException(
+            {
+              message: 'GitHub API rate limit exceeded',
+              retryAfter,
+            },
+            HttpStatus.TOO_MANY_REQUESTS,
+          );
+        }
 
-      if (error.status && error.status >= 400) {
-        throw new HttpException(
-          'GitHub API error',
-          HttpStatus.SERVICE_UNAVAILABLE,
-        );
+        if (status && status >= 400) {
+          throw new HttpException(
+            'GitHub API error',
+            HttpStatus.SERVICE_UNAVAILABLE,
+          );
+        }
       }
 
       throw new HttpException(

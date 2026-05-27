@@ -1,12 +1,19 @@
 import { GithubService } from './github.service';
 import { HttpException } from '@nestjs/common';
 import * as octokitModule from '@octokit/rest';
+import { GithubApiError } from './github-error.types';
 
 jest.mock('@octokit/rest');
 
 describe('GithubService', () => {
   let service: GithubService;
-  let mockOctokit: any;
+  let mockOctokit: {
+    rest: {
+      search: {
+        repos: jest.Mock;
+      };
+    };
+  };
 
   beforeEach(() => {
     mockOctokit = {
@@ -52,7 +59,12 @@ describe('GithubService', () => {
     it('should return mapped repositories on successful search', async () => {
       mockOctokit.rest.search.repos.mockResolvedValue(mockResponse);
 
-      const result = await service.searchRepositories('typescript', '2023-01-01', 1, 20);
+      const result = await service.searchRepositories(
+        'typescript',
+        '2023-01-01',
+        1,
+        20,
+      );
 
       expect(result).toHaveLength(1);
       expect(result[0]).toEqual({
@@ -73,7 +85,12 @@ describe('GithubService', () => {
         data: { items: [] },
       });
 
-      const result = await service.searchRepositories('typescript', '2023-01-01', 1, 20);
+      const result = await service.searchRepositories(
+        'typescript',
+        '2023-01-01',
+        1,
+        20,
+      );
 
       expect(result).toEqual([]);
     });
@@ -92,7 +109,12 @@ describe('GithubService', () => {
 
       mockOctokit.rest.search.repos.mockResolvedValue(responseWithNullDesc);
 
-      const result = await service.searchRepositories('typescript', '2023-01-01', 1, 20);
+      const result = await service.searchRepositories(
+        'typescript',
+        '2023-01-01',
+        1,
+        20,
+      );
 
       expect(result[0].description).toBeNull();
     });
@@ -111,15 +133,20 @@ describe('GithubService', () => {
 
       mockOctokit.rest.search.repos.mockResolvedValue(responseWithNullLang);
 
-      const result = await service.searchRepositories('typescript', '2023-01-01', 1, 20);
+      const result = await service.searchRepositories(
+        'typescript',
+        '2023-01-01',
+        1,
+        20,
+      );
 
       expect(result[0].language).toBeNull();
     });
 
     it('should throw HttpException with 429 status on rate limit (429 status)', async () => {
-      const error = new Error('Rate limit');
-      (error as any).status = 429;
-      (error as any).headers = { 'retry-after': '60' };
+      const error: GithubApiError = new Error('Rate limit');
+      error.status = 429;
+      error.headers = { 'retry-after': '60' };
 
       mockOctokit.rest.search.repos.mockRejectedValue(error);
 
@@ -135,9 +162,9 @@ describe('GithubService', () => {
     });
 
     it('should throw HttpException with 429 status on forbidden (403 status)', async () => {
-      const error = new Error('Forbidden');
-      (error as any).status = 403;
-      (error as any).headers = { 'retry-after': '60' };
+      const error: GithubApiError = new Error('Forbidden');
+      error.status = 403;
+      error.headers = { 'retry-after': '60' };
 
       mockOctokit.rest.search.repos.mockRejectedValue(error);
 
@@ -149,8 +176,8 @@ describe('GithubService', () => {
     });
 
     it('should throw HttpException with 503 status on timeout', async () => {
-      const error = new Error('Timeout');
-      (error as any).name = 'AbortError';
+      const error = new Error('Timeout') as GithubApiError;
+      error.name = 'AbortError';
 
       mockOctokit.rest.search.repos.mockRejectedValue(error);
 
@@ -162,8 +189,8 @@ describe('GithubService', () => {
     });
 
     it('should throw HttpException with 503 status on other API errors', async () => {
-      const error = new Error('Server error');
-      (error as any).status = 500;
+      const error: GithubApiError = new Error('Server error');
+      error.status = 500;
 
       mockOctokit.rest.search.repos.mockRejectedValue(error);
 
