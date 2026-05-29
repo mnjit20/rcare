@@ -13,7 +13,6 @@ export class GithubService {
   private octokit: Octokit;
 
   constructor() {
-    console.log('Initializing GithubService', process.env.GITHUB_TOKEN);
     const token = process.env.GITHUB_TOKEN;
     this.octokit = new Octokit({
       auth: token,
